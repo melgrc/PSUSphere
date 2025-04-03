@@ -1,0 +1,151 @@
+<?php
+$host = "localhost";
+$user = "root"; // Your DB username
+$password = ""; // Your DB password
+$database = "your_database"; // Your DB name
+
+$conn = new mysqli($host, $user, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <title>Project Management</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Project Management Dashboard</h1>
+        <ul>
+            <li><a href="organization_list.php">Manage Organizations</a></li>
+            <li><a href="org_member_list.php">Manage Org Members</a></li>
+            <li><a href="student_list.php">Manage Students</a></li>
+            <li><a href="college_list.php">Manage Colleges</a></li>
+            <li><a href="program_list.php">Manage Programs</a></li>
+        </ul>
+    </div>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+<?php
+include '../includes/db.php';
+
+// Fetch organizations
+$query = "SELECT * FROM organizations";
+$result = $conn->query($query);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <title>Organizations</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Organizations</h1>
+        <a href="add_organization.php" class="btn btn-success mb-3">Add Organization</a>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?php echo $row['id']; ?></td>
+                    <td><?php echo $row['name']; ?></td>
+                    <td>
+                        <a href="edit_organization.php?id=<?php echo $row['id']; ?>" class="btn btn-warning">Edit</a>
+                        <a href="delete_organization.php?id=<?php echo $row['id']; ?>" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+<?php
+include '../includes/db.php';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = $_POST['name'];
+    $query = "INSERT INTO organizations (name) VALUES ('$name')";
+    $conn->query($query);
+    header("Location: organization_list.php");
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <title>Add Organization</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Add Organization</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="name">Organization Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add</button>
+            <a href="organization_list.php" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+<?php
+include '../includes/db.php';
+
+$id = $_GET['id'];
+$query = "SELECT * FROM organizations WHERE id=$id";
+$result = $conn->query($query);
+$organization = $result->fetch_assoc();
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = $_POST['name'];
+    $query = "UPDATE organizations SET name='$name' WHERE id=$id";
+    $conn->query($query);
+    header("Location: organization_list.php");
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <title>Edit Organization</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Edit Organization</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="name">Organization Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="<?php echo $organization['name']; ?>" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="organization_list.php" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
